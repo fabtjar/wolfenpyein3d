@@ -32,59 +32,107 @@ EMPTY = "."
 PLAYER = "X"
 
 FOV = math.pi / 8
-DEPTH = 16
+RAY_JUMP = 0.1
+RAY_DEPTH = 16
+
 MOVE_SPEED = 0.8
-ANGLE_SPEED = 0.1
+ROTATE_SPEED = 0.1
 
 
-def run_game():
-    pygame.init()
-    pygame.display.set_caption("Wolfenpyein 3D")
-    window = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    screen = numpy.array([[(0, 0, 0)] * SCREEN_HEIGHT] * SCREEN_WIDTH)
+class Player:
+    def __init__(self, x, y):
+        self.x, self.y = x, y
+        self.angle = 0
 
-    player_map = MAP.find(PLAYER)
-    player_x = player_map % MAP_WIDTH + 0.5
-    player_y = player_map // MAP_WIDTH + 0.5
-    player_angle = 0
 
-    run = True
-    while run:
+class Window:
+    def __init__(self, width, height, title=None):
+        pygame.init()
+        self.surface = pygame.display.set_mode((width, height))
+        if title is not None:
+            pygame.display.set_caption(title)
+
+    def update(self, screen):
+        pygame.surfarray.blit_array(self.surface, screen)
+        pygame.display.flip()
+
+    def quit(self):
+        pygame.quit()
+
+
+class Input:
+    def __init__(self):
+        self.quit = False
+        self.forward = 0
+        self.rotate = 0
+
+    def update(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                run = False
+                self.quit = True
 
         keys = pygame.key.get_pressed()
+
+        self.rotate = 0
         if keys[pygame.K_LEFT]:
-            player_angle -= ANGLE_SPEED
+            self.rotate = -1
         if keys[pygame.K_RIGHT]:
-            player_angle += ANGLE_SPEED
+            self.rotate = 1
 
-        move_x, move_y = player_x, player_y
-
+        self.forward = 0
         if keys[pygame.K_UP]:
-            move_x += math.sin(player_angle) * MOVE_SPEED
-            move_y += math.cos(player_angle) * MOVE_SPEED
+            self.forward = 1
         if keys[pygame.K_DOWN]:
-            move_x -= math.sin(player_angle) * MOVE_SPEED
-            move_y -= math.cos(player_angle) * MOVE_SPEED
+            self.forward = -1
+
+
+class Game:
+    def __init__(self):
+        self.window = Window(SCREEN_WIDTH, SCREEN_HEIGHT, "Wolfenpyein 3D")
+        self.screen = numpy.array([[(0, 0, 0)] * SCREEN_HEIGHT] * SCREEN_WIDTH)
+
+        player_index = MAP.find(PLAYER)
+        px = player_index % MAP_WIDTH + 0.5
+        py = player_index // MAP_WIDTH + 0.5
+        self.player = Player(px, py)
+
+        self.input = Input()
+
+    def run(self):
+        self.quit = False
+        while not self.quit:
+            self.update()
+            self.render()
+        self.window.quit()
+
+    def update(self):
+        self.input.update()
+
+        if self.input.quit:
+            self.quit = True
+
+        self.player.angle += self.input.rotate * ROTATE_SPEED
+
+        move_x, move_y = self.player.x, self.player.y
+        move_x += math.cos(self.player.angle) * self.input.forward * MOVE_SPEED
+        move_y += math.sin(self.player.angle) * self.input.forward * MOVE_SPEED
 
         if MAP[int(move_y) * MAP_WIDTH + int(move_x)] != WALL:
-            player_x, player_y = move_x, move_y
+            self.player.x, self.player.y = move_x, move_y
 
+    def render(self):
         for x in range(SCREEN_WIDTH):
-            ray_angle = (player_angle - FOV / 2) + (x / SCREEN_WIDTH) * FOV
-            dist_to_wall = 0
+            ray_angle = (self.player.angle - FOV / 2) + (x / SCREEN_WIDTH) * FOV
+            dx = math.cos(ray_angle)
+            dy = math.sin(ray_angle)
+
             hit_wall = False
-
-            eye_x = math.sin(ray_angle)
-            eye_y = math.cos(ray_angle)
-
-            while not hit_wall and dist_to_wall < DEPTH:
-                dist_to_wall += 0.1
-                test_x = int(player_x + eye_x * dist_to_wall)
-                test_y = int(player_y + eye_y * dist_to_wall)
-                if MAP[test_y * MAP_WIDTH + test_x] == WALL:
+            dist_to_wall = 0
+            while not hit_wall and dist_to_wall < RAY_DEPTH:
+                dist_to_wall += RAY_JUMP
+                ray_x = int(self.player.x + dx * dist_to_wall)
+                ray_y = int(self.player.y + dy * dist_to_wall)
+                if MAP[ray_y * MAP_WIDTH + ray_x] == WALL:
                     hit_wall = True
 
             ceiling = (SCREEN_HEIGHT / 2) - SCREEN_HEIGHT / dist_to_wall
@@ -95,18 +143,15 @@ def run_game():
                     fade = int(255 * (1 - (y / (SCREEN_HEIGHT / 2))))
                     col = (0, 0, fade)
                 elif y >= ceiling and y <= floor:
-                    fade = int(255 * max(0, 1 - dist_to_wall / DEPTH))
+                    fade = int(255 * max(0, 1 - dist_to_wall / RAY_DEPTH))
                     col = (0, fade, 0)
                 else:
                     fade = int(255 * (y - SCREEN_HEIGHT / 2) / (SCREEN_HEIGHT / 2))
                     col = (fade, 0, 0)
-                screen[x][y] = col
+                self.screen[x][y] = col
 
-        pygame.surfarray.blit_array(window, screen)
-        pygame.display.flip()
-
-    pygame.quit()
+        self.window.update(self.screen)
 
 
 if __name__ == "__main__":
-    run_game()
+    Game().run()
