@@ -63,11 +63,11 @@ def run_game():
         move_x, move_y = player_x, player_y
 
         if keys[pygame.K_UP]:
-            move_x += math.sin(player_angle) * MOVE_SPEED
-            move_y += math.cos(player_angle) * MOVE_SPEED
+            move_x += math.cos(player_angle) * MOVE_SPEED
+            move_y += math.sin(player_angle) * MOVE_SPEED
         if keys[pygame.K_DOWN]:
-            move_x -= math.sin(player_angle) * MOVE_SPEED
-            move_y -= math.cos(player_angle) * MOVE_SPEED
+            move_x -= math.cos(player_angle) * MOVE_SPEED
+            move_y -= math.sin(player_angle) * MOVE_SPEED
 
         if MAP[int(move_y) * MAP_WIDTH + int(move_x)] != WALL:
             player_x, player_y = move_x, move_y
@@ -77,8 +77,8 @@ def run_game():
             dist_to_wall = 0
             hit_wall = False
 
-            eye_x = math.sin(ray_angle)
-            eye_y = math.cos(ray_angle)
+            eye_x = math.cos(ray_angle)
+            eye_y = math.sin(ray_angle)
 
             while not hit_wall and dist_to_wall < DEPTH:
                 dist_to_wall += 0.1
