@@ -1,6 +1,6 @@
 import math
 
-import numpy as np
+import numpy
 import pygame
 
 SCREEN_WIDTH = 480
@@ -41,7 +41,7 @@ def run_game():
     pygame.init()
     pygame.display.set_caption("Wolfenpyein 3D")
     window = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    screen = np.array([[(0, 0, 0)] * SCREEN_HEIGHT] * SCREEN_WIDTH)
+    screen = numpy.array([[(0, 0, 0)] * SCREEN_HEIGHT] * SCREEN_WIDTH)
 
     player_map = MAP.find(PLAYER)
     player_x = player_map % MAP_WIDTH + 0.5
