@@ -1,5 +1,6 @@
 import math
 
+import numpy as np
 import pygame
 
 SCREEN_WIDTH = 480
@@ -40,7 +41,7 @@ def run_game():
     pygame.init()
     pygame.display.set_caption("Wolfenpyein 3D")
     window = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    screen = [0] * SCREEN_WIDTH * SCREEN_HEIGHT
+    screen = np.array([[(0, 0, 0)] * SCREEN_HEIGHT] * SCREEN_WIDTH)
 
     player_map = MAP.find(PLAYER)
     player_x = player_map % MAP_WIDTH + 0.5
@@ -99,10 +100,9 @@ def run_game():
                 else:
                     fade = int(255 * (y - SCREEN_HEIGHT / 2) / (SCREEN_HEIGHT / 2))
                     col = (fade, 0, 0)
-                screen[y * SCREEN_WIDTH + x] = col
+                screen[x][y] = col
 
-        for i, col in enumerate(screen):
-            window.set_at((i % SCREEN_WIDTH, i // SCREEN_WIDTH), col)
+        pygame.surfarray.blit_array(window, screen)
         pygame.display.flip()
 
     pygame.quit()
