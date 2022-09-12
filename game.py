@@ -68,7 +68,7 @@ def run_game():
             move_x -= math.sin(player_angle) * MOVE_SPEED
             move_y -= math.cos(player_angle) * MOVE_SPEED
 
-        if MAP[int(move_y) * MAP_WIDTH + int(move_x)] == EMPTY:
+        if MAP[int(move_y) * MAP_WIDTH + int(move_x)] != WALL:
             player_x, player_y = move_x, move_y
 
         for x in range(SCREEN_WIDTH):
