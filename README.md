@@ -4,6 +4,8 @@ Simple ray casting rendering similar to the [Wolfenstein 3D](https://en.wikipedi
 
 Inspired by javidx9's [video](https://youtu.be/xW8skO7MFYw).
 
+![gameplay](gameplay.gif)
+
 ## Controls
 
 &larr; &rarr; Rotate camera
