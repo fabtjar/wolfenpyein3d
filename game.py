@@ -1,6 +1,5 @@
 import math
 
-import numpy as np
 import pygame
 
 SCREEN_WIDTH = 480
