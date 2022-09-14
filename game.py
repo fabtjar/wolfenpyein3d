@@ -41,7 +41,7 @@ def run_game():
     pygame.init()
     pygame.display.set_caption("Wolfenpyein 3D")
     window = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    screen = np.array([[(0, 0, 0)] * SCREEN_HEIGHT] * SCREEN_WIDTH)
+    screen = pygame.surfarray.pixels2d(window)
 
     player_map = MAP.find(PLAYER)
     player_x = player_map % MAP_WIDTH + 0.5
@@ -93,13 +93,13 @@ def run_game():
             for y in range(SCREEN_HEIGHT):
                 if y < ceiling:
                     fade = int(255 * (1 - (y / (SCREEN_HEIGHT / 2))))
-                    col = (0, 0, fade)
+                    col = fade << 0
                 elif y >= ceiling and y <= floor:
                     fade = int(255 * max(0, 1 - dist_to_wall / DEPTH))
-                    col = (0, fade, 0)
+                    col = fade << 8
                 else:
                     fade = int(255 * (y - SCREEN_HEIGHT / 2) / (SCREEN_HEIGHT / 2))
-                    col = (fade, 0, 0)
+                    col = fade << 16
                 screen[x][y] = col
 
         pygame.surfarray.blit_array(window, screen)
