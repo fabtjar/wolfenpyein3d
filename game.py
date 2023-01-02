@@ -91,7 +91,7 @@ def run_game():
                 if y < ceiling:
                     fade = int(255 * (1 - (y / (SCREEN_HEIGHT / 2))))
                     col = fade << 0
-                elif y >= ceiling and y <= floor:
+                elif ceiling <= y <= floor:
                     fade = int(255 * max(0, 1 - dist_to_wall / DEPTH))
                     col = fade << 8
                 else:
