@@ -30,7 +30,7 @@ WALL = "#"
 EMPTY = "."
 PLAYER = "X"
 
-FOV = math.pi / 8
+FOV = math.pi / 4
 DEPTH = 16
 MOVE_SPEED = 0.8
 ANGLE_SPEED = 0.1
